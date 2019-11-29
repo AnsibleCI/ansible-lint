@@ -65,6 +65,10 @@ def main():
                       default=False,
                       action='store_true',
                       help="parseable output in the format of pep8")
+    parser.add_option('--parseable-json', dest='parseable_json',
+                      default=False,
+                      action='store_true',
+                      help="parseable output in JSON format")
     parser.add_option('--parseable-severity', dest='parseable_severity',
                       default=False,
                       action='store_true',
@@ -116,6 +120,10 @@ def main():
 
         if 'parseable' in config:
             options.parseable = options.parseable or config['parseable']
+
+        if 'parseable_json' in config:
+            options.parseable_json = options.parseable_json or \
+                config['parseable_json']
 
         if 'parseable_severity' in config:
             options.parseable_severity = options.parseable_severity or \
@@ -188,8 +196,12 @@ def main():
 
     matches.sort(key=lambda x: (normpath(x.filename), x.linenumber, x.rule.id))
 
-    for match in matches:
-        print(formatter.format(match, options.colored))
+    if options.parseable_json:
+        formatter = formatters.ParseableJsonFormatter()
+        formatter.format(matches)
+    else:
+        for match in matches:
+            print(formatter.format(match, options.colored))
 
     if len(matches):
         return 2

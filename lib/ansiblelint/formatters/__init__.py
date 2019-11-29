@@ -1,4 +1,7 @@
 """Output formatters."""
+
+import json
+
 try:
     from ansible import color
 except ImportError:
@@ -54,6 +57,23 @@ class ParseableFormatter(object):
                                     match.linenumber,
                                     "E" + match.rule.id,
                                     match.message)
+
+
+class ParseableJsonFormatter(object):
+
+    def format(self, matches):
+        results = list()
+        for match in matches:
+            results.append({
+                'filename': normpath(match.filename), 
+                'linenumber': str(match.linenumber),
+                'rule_id': match.rule.id,
+                'rule_title': str(match.message),
+                'rule_description': match.rule.description,
+                'rule_severity': match.rule.severity
+                })
+        json_data = json.dumps(results)
+        print(json_data)
 
 
 class ParseableSeverityFormatter(object):
